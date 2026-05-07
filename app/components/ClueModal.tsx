@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Clue } from "../data/questions";
+import { Questions } from "../data/questions";
 import { Team } from "./TeamScoreboard";
 
 type ClueModalProps = {
-  clue: Clue;
+  clue: Questions;
   teams: Team[];
   onAwardPoints: (teamId: string, value: number) => void;
   onClose: () => void;
@@ -17,13 +17,13 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <div className="bg-iota-dark-blue w-full max-w-5xl rounded-2xl shadow-[0_0_50px_rgba(29,78,216,0.5)] border-4 border-iota-blue flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
-        
+
         {/* Header / Value */}
         <div className="bg-blue-950 p-4 text-center border-b-2 border-iota-blue relative">
           <h2 className="text-4xl md:text-5xl font-black text-iota-light-gold drop-shadow-md">
             ${clue.value}
           </h2>
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-1/2 -translate-y-1/2 right-6 text-white hover:text-red-400 font-bold text-xl transition-colors"
           >
