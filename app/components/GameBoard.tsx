@@ -11,7 +11,7 @@ type GameBoardProps = {
 export default function GameBoard({ categories, answeredClues, onClueClick }: GameBoardProps) {
   return (
     <div className="w-full max-w-7xl mx-auto p-4 flex-1 flex flex-col justify-center">
-      <div className="grid grid-cols-6 gap-2 sm:gap-4 w-full h-full min-h-[60vh]">
+      <div className="grid grid-cols-5 gap-2 sm:gap-4 w-full h-full min-h-[60vh]">
         {/* Category Headers */}
         {categories.map((category) => (
           <div
@@ -25,8 +25,8 @@ export default function GameBoard({ categories, answeredClues, onClueClick }: Ga
         ))}
 
         {/* Clues */}
-        {/* Assuming all categories have the same number of clues, we iterate by row then column */}
-        {Array.from({ length: 5 }).map((_, rowIndex) =>
+        {/* Iterate by row then column based on max number of clues */}
+        {Array.from({ length: Math.max(...categories.map(c => c.clues.length)) }).map((_, rowIndex) =>
           categories.map((category) => {
             const clue = category.clues[rowIndex];
             if (!clue) return <div key={`${category.id}-empty-${rowIndex}`} />; // Fallback

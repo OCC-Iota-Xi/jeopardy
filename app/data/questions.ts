@@ -1,4 +1,4 @@
-export type Clue = {
+export type Questions = {
   id: string;
   question: string;
   answer: string;
@@ -8,7 +8,7 @@ export type Clue = {
 export type Category = {
   id: string;
   name: string;
-  clues: Clue[];
+  clues: Questions[];
 };
 
 export const jeopardyData: Category[] = [
@@ -58,7 +58,7 @@ export const jeopardyData: Category[] = [
   },
   {
     id: "cat-5",
-    name: "Programming Languages", //updated
+    name: "Other than CS", //updated
     clues: [
       { id: "c5-100", value: 100, question: "This organ pumps blood through the human body.", answer: "What is heart?" },
       { id: "c5-200", value: 200, question: "This is the largest planet in our solar system.", answer: "What is Jupiter?" },

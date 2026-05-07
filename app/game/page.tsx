@@ -6,13 +6,13 @@ import Link from "next/link";
 import GameBoard from "../components/GameBoard";
 import ClueModal from "../components/ClueModal";
 import TeamScoreboard, { Team } from "../components/TeamScoreboard";
-import { jeopardyData, Clue, Category } from "../data/questions";
+import { jeopardyData, Questions, Category } from "../data/questions";
 
 export default function Game() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [answeredClues, setAnsweredClues] = useState<string[]>([]);
-  const [activeClue, setActiveClue] = useState<Clue | null>(null);
-  
+  const [activeClue, setActiveClue] = useState<Questions | null>(null);
+
   // Load teams from localStorage if available (optional enhancement)
   useEffect(() => {
     const savedTeams = localStorage.getItem("jeopardyTeams");
@@ -35,7 +35,7 @@ export default function Game() {
   };
 
   const handleUpdateScore = (teamId: string, amount: number) => {
-    setTeams(teams.map(team => 
+    setTeams(teams.map(team =>
       team.id === teamId ? { ...team, score: team.score + amount } : team
     ));
     // If we just awarded points from a modal, we might want to close it, 
@@ -47,7 +47,7 @@ export default function Game() {
     if (!category) return;
     const clue = category.clues.find(c => c.id === clueId);
     if (!clue) return;
-    
+
     setActiveClue(clue);
     if (!answeredClues.includes(clueId)) {
       setAnsweredClues([...answeredClues, clueId]);
@@ -64,11 +64,11 @@ export default function Game() {
       <header className="bg-neutral-900 border-b border-iota-blue/30 p-4 flex justify-between items-center z-10 relative">
         <div className="flex items-center gap-4">
           <Link href="/">
-            <Image 
-              src="/iota_xi_logo_color.png" 
-              alt="Iota Xi Logo" 
-              width={60} 
-              height={60} 
+            <Image
+              src="/iota_xi_logo_color.png"
+              alt="Iota Xi Logo"
+              width={60}
+              height={60}
               className="object-contain hover:scale-105 transition-transform"
             />
           </Link>
@@ -77,9 +77,9 @@ export default function Game() {
           </h1>
         </div>
         <div>
-          <button 
+          <button
             onClick={() => {
-              if(confirm("Are you sure you want to reset the game? This clears all scores and the board.")) {
+              if (confirm("Are you sure you want to reset the game? This clears all scores and the board.")) {
                 setAnsweredClues([]);
                 setTeams(teams.map(t => ({ ...t, score: 0 })));
               }
@@ -93,32 +93,32 @@ export default function Game() {
 
       {/* Main Game Area */}
       <main className="flex-1 flex flex-col relative z-0">
-        <GameBoard 
-          categories={jeopardyData} 
-          answeredClues={answeredClues} 
-          onClueClick={handleClueClick} 
+        <GameBoard
+          categories={jeopardyData}
+          answeredClues={answeredClues}
+          onClueClick={handleClueClick}
         />
       </main>
 
       {/* Bottom Scoreboard */}
       <footer className="z-10 relative mt-auto">
-        <TeamScoreboard 
-          teams={teams} 
-          onAddTeam={handleAddTeam} 
-          onUpdateScore={handleUpdateScore} 
+        <TeamScoreboard
+          teams={teams}
+          onAddTeam={handleAddTeam}
+          onUpdateScore={handleUpdateScore}
         />
       </footer>
 
       {/* Modal Overlay */}
       {activeClue && (
-        <ClueModal 
-          clue={activeClue} 
-          teams={teams} 
-          onAwardPoints={handleUpdateScore} 
-          onClose={closeClue} 
+        <ClueModal
+          clue={activeClue}
+          teams={teams}
+          onAwardPoints={handleUpdateScore}
+          onClose={closeClue}
         />
       )}
-      
+
       {/* Background decoration */}
       <div className="fixed inset-0 pointer-events-none z-[-1] opacity-20">
         <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-iota-blue/20 rounded-full blur-[100px]" />
