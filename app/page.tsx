@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { playAudio } from "./data/audioPlayer";
 
 export default function Home() {
   return (
@@ -22,9 +25,9 @@ export default function Home() {
               priority
             />
           </div>
-          
+
           <div>
-            <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400 tracking-tighter uppercase mb-2">
+            <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-linear-to-br from-white to-neutral-400 tracking-tighter uppercase mb-2">
               <span className="text-iota-blue">Iota Xi</span>
               <br />
               Jeopardy
@@ -37,8 +40,9 @@ export default function Home() {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-6 animate-in slide-in-from-bottom-8 fade-in duration-1000 delay-300 fill-mode-both">
-          <Link 
+          <Link
             href="/game"
+            onClick={() => playAudio('Start Game.mp3')}
             className="group relative px-8 py-4 bg-iota-blue hover:bg-iota-dark-blue text-white rounded-full font-bold text-xl overflow-hidden transition-all shadow-[0_0_20px_rgba(29,78,216,0.4)] hover:shadow-[0_0_40px_rgba(29,78,216,0.8)] hover:-translate-y-1"
           >
             <span className="relative z-10 flex items-center gap-2">
@@ -53,7 +57,7 @@ export default function Home() {
         {/* Rules Section */}
         <div className="w-full max-w-3xl mt-8 bg-neutral-900/60 backdrop-blur-md border border-iota-blue/30 p-8 rounded-2xl text-left animate-in slide-in-from-bottom-12 fade-in duration-1000 delay-500 fill-mode-both shadow-[0_0_30px_rgba(0,0,0,0.5)]">
           <h2 className="text-3xl font-bold text-iota-light-gold mb-8 text-center uppercase tracking-wider">How to Play</h2>
-          
+
           <div className="space-y-6 text-neutral-300">
             <section>
               <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-3">
@@ -62,7 +66,7 @@ export default function Home() {
               </h3>
               <p className="pl-11">Players are divided into teams of 4 players.</p>
             </section>
-            
+
             <section>
               <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-3">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-iota-blue text-white text-sm">2</span>
@@ -70,7 +74,7 @@ export default function Home() {
               </h3>
               <p className="pl-11">The first team to choose a question is decided by Rock, Paper, Scissors, Shoot then the winning team will choose a question.</p>
             </section>
-            
+
             <section>
               <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-3">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-iota-blue text-white text-sm">3</span>
@@ -78,7 +82,7 @@ export default function Home() {
               </h3>
               <p className="pl-11">Each round, one player from each team comes forward to answer the question.</p>
             </section>
-            
+
             <section>
               <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-3">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-iota-blue text-white text-sm">4</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Category } from "../data/questions";
+import { playAudio } from "../data/audioPlayer";
 
 type GameBoardProps = {
   categories: Category[];
@@ -30,21 +31,23 @@ export default function GameBoard({ categories, answeredClues, onClueClick }: Ga
           categories.map((category) => {
             const clue = category.clues[rowIndex];
             if (!clue) return <div key={`${category.id}-empty-${rowIndex}`} />; // Fallback
-            
+
             const isAnswered = answeredClues.includes(clue.id);
 
             return (
               <button
                 key={clue.id}
                 disabled={isAnswered}
-                onClick={() => onClueClick(category.id, clue.id)}
+                onClick={() => {
+                  playAudio('Question Button Click.mp3');
+                  onClueClick(category.id, clue.id);
+                }}
                 className={`
                   relative overflow-hidden rounded-lg border-2 flex items-center justify-center
                   transition-all duration-300 transform
-                  ${
-                    isAnswered
-                      ? "bg-neutral-900 border-neutral-800 opacity-40 cursor-not-allowed"
-                      : "bg-gradient-to-b from-blue-900 to-iota-dark-blue border-iota-blue hover:scale-105 hover:border-iota-light-gold cursor-pointer shadow-lg hover:shadow-iota-blue/50"
+                  ${isAnswered
+                    ? "bg-neutral-900 border-neutral-800 opacity-40 cursor-not-allowed"
+                    : "bg-linear-to-b from-blue-900 to-iota-dark-blue border-iota-blue hover:scale-105 hover:border-iota-light-gold cursor-pointer shadow-lg hover:shadow-iota-blue/50"
                   }
                 `}
               >

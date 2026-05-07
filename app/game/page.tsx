@@ -15,6 +15,7 @@ export default function Game() {
   const [activeClue, setActiveClue] = useState<Questions | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showSetupModal, setShowSetupModal] = useState(false);
+  const [manualGameOver, setManualGameOver] = useState(false);
   const router = useRouter();
 
   // Load teams from localStorage if available
@@ -29,7 +30,7 @@ export default function Game() {
         console.error("Failed to parse teams", e);
       }
     }
-    
+
     if (loadedTeams.length === 0) {
       // Check if this is a page refresh
       const navEntries = window.performance.getEntriesByType("navigation");
@@ -81,6 +82,11 @@ export default function Game() {
     setActiveClue(null);
   };
 
+  const totalClues = jeopardyData.reduce((acc, cat) => acc + cat.clues.length, 0);
+  const isGameOver = manualGameOver || (answeredClues.length > 0 && answeredClues.length === totalClues);
+  const maxScore = teams.length > 0 ? Math.max(...teams.map(t => t.score)) : 0;
+  const winners = teams.filter(t => t.score === maxScore && teams.length > 0);
+
   return (
     <div className="flex flex-col min-h-screen bg-black overflow-hidden relative">
       {/* Header bar */}
@@ -99,12 +105,23 @@ export default function Game() {
             <span className="text-iota-blue">Iota Xi</span> Jeopardy
           </h1>
         </div>
-        <div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => {
+              if (confirm("Are you sure you want to finish the game now?")) {
+                setManualGameOver(true);
+              }
+            }}
+            className="text-white font-bold bg-iota-gold hover:bg-iota-light-gold px-4 py-1.5 rounded-full transition-colors text-sm shadow-[0_0_10px_rgba(217,119,6,0.5)]"
+          >
+            Finish Game
+          </button>
           <button
             onClick={() => {
               if (confirm("Are you sure you want to reset the game? This clears all scores and the board.")) {
                 setAnsweredClues([]);
                 setTeams([]);
+                setManualGameOver(false);
                 setShowSetupModal(true);
               }
             }}
@@ -150,7 +167,7 @@ export default function Game() {
           <div className="bg-neutral-900 border-2 border-iota-blue p-8 rounded-2xl max-w-lg w-full flex flex-col items-center shadow-[0_0_50px_rgba(29,78,216,0.5)]">
             <h2 className="text-3xl font-bold text-white mb-4 uppercase tracking-widest text-center">Team Setup</h2>
             <p className="text-neutral-400 mb-8 text-center text-sm">Add at least two teams to begin the game. (4 players per team recommended)</p>
-            
+
             <div className="w-full space-y-3 mb-6 max-h-[30vh] overflow-y-auto pr-2">
               {teams.length === 0 && (
                 <p className="text-neutral-600 text-center italic py-4">No teams added yet.</p>
@@ -158,7 +175,7 @@ export default function Game() {
               {teams.map((team) => (
                 <div key={team.id} className="flex justify-between items-center bg-neutral-800 p-3 rounded border border-neutral-700 animate-in slide-in-from-left-4 fade-in">
                   <span className="text-white font-bold">{team.name}</span>
-                  <button 
+                  <button
                     onClick={() => handleRemoveTeam(team.id)}
                     className="text-red-400 hover:text-red-300 font-bold px-2"
                   >
@@ -168,7 +185,7 @@ export default function Game() {
               ))}
             </div>
 
-            <form 
+            <form
               onSubmit={(e) => {
                 e.preventDefault();
                 const input = new FormData(e.currentTarget).get('teamName') as string;
@@ -176,7 +193,7 @@ export default function Game() {
                   handleAddTeam(input.trim());
                   (e.target as HTMLFormElement).reset();
                 }
-              }} 
+              }}
               className="flex gap-2 w-full mb-8"
             >
               <input
@@ -204,6 +221,56 @@ export default function Game() {
               Start Playing
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Celebration Overlay */}
+      {hasLoaded && isGameOver && (
+        <div className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-4 animate-in fade-in zoom-in duration-1000">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {Array.from({ length: 50 }).map((_, i) => (
+              <div
+                key={i}
+                className={`absolute w-3 h-3 ${i % 2 === 0 ? 'bg-iota-gold' : 'bg-iota-blue'} rounded-sm animate-fall`}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  animationDuration: `${Math.random() * 3 + 2}s`,
+                  animationDelay: `${Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
+
+          <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-linear-to-br from-iota-light-gold to-yellow-600 uppercase tracking-widest drop-shadow-[0_0_50px_rgba(253,224,71,0.5)] mb-8 animate-bounce">
+            Game Over!
+          </h1>
+
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-12 text-center">
+            {winners.length > 1 ? "The Winners are..." : "The Winner is..."}
+          </h2>
+
+          <div className="flex flex-wrap justify-center gap-8 mb-12">
+            {winners.map(winner => (
+              <div key={winner.id} className="bg-iota-blue/20 border-4 border-iota-light-gold rounded-2xl p-8 flex flex-col items-center shadow-[0_0_50px_rgba(253,224,71,0.4)] animate-pulse">
+                <span className="text-4xl md:text-6xl font-black text-white mb-4">{winner.name}</span>
+                <span className="text-3xl text-iota-light-gold font-mono font-bold">${winner.score}</span>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => {
+              if (confirm("Play again? This will reset all scores and the board.")) {
+                setAnsweredClues([]);
+                setTeams([]);
+                setManualGameOver(false);
+                setShowSetupModal(true);
+              }
+            }}
+            className="relative z-10 px-8 py-4 bg-iota-blue hover:bg-iota-dark-blue text-white rounded-full font-bold text-xl transition-all shadow-[0_0_20px_rgba(29,78,216,0.6)] hover:scale-105"
+          >
+            Play Again
+          </button>
         </div>
       )}
 

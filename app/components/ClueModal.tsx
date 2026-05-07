@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Questions } from "../data/questions";
 import { Team } from "./TeamScoreboard";
+import { playAudio } from "../data/audioPlayer";
 
 type ClueModalProps = {
   clue: Questions;
@@ -83,10 +84,11 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
               )}
               {teams.map((team) => (
                 <div key={team.id} className="flex flex-col items-center gap-2 bg-neutral-800 p-3 rounded-lg border border-neutral-700">
-                  <span className="text-white font-bold max-w-[150px] truncate" title={team.name}>{team.name}</span>
+                  <span className="text-white font-bold max-w-37.5 truncate" title={team.name}>{team.name}</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
+                        playAudio('incorrect.mp3');
                         onAwardPoints(team.id, 0);
                         onClose();
                       }}
@@ -96,6 +98,7 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
                     </button>
                     <button
                       onClick={() => {
+                        playAudio('correct.mp3');
                         onAwardPoints(team.id, clue.value);
                         onClose();
                       }}
