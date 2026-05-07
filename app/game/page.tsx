@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ export default function Game() {
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [manualGameOver, setManualGameOver] = useState(false);
   const router = useRouter();
+  const gameOverAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Load teams from localStorage if available
   useEffect(() => {
@@ -86,6 +87,25 @@ export default function Game() {
   const isGameOver = manualGameOver || (answeredClues.length > 0 && answeredClues.length === totalClues);
   const maxScore = teams.length > 0 ? Math.max(...teams.map(t => t.score)) : 0;
   const winners = teams.filter(t => t.score === maxScore && teams.length > 0);
+
+  useEffect(() => {
+    if (hasLoaded && isGameOver) {
+      gameOverAudioRef.current = new Audio("/Squid Game celebration - 'What is Love'  Meme.mp3");
+      gameOverAudioRef.current.play().catch(e => console.error("Game over audio failed:", e));
+    } else {
+      if (gameOverAudioRef.current) {
+        gameOverAudioRef.current.pause();
+        gameOverAudioRef.current = null;
+      }
+    }
+
+    return () => {
+      if (gameOverAudioRef.current) {
+        gameOverAudioRef.current.pause();
+        gameOverAudioRef.current = null;
+      }
+    };
+  }, [hasLoaded, isGameOver]);
 
   return (
     <div className="flex flex-col min-h-screen bg-black overflow-hidden relative">

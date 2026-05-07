@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Questions } from "../data/questions";
 import { Team } from "./TeamScoreboard";
 import { playAudio } from "../data/audioPlayer";
@@ -15,6 +15,35 @@ type ClueModalProps = {
 export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueModalProps) {
   const [showAnswer, setShowAnswer] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio('/Squid Game Theme.mp3');
+    audioRef.current.loop = true;
+    
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(e => {
+        if (e.name !== 'AbortError') {
+          console.error("Theme playback failed:", e);
+        }
+      });
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showAnswer && audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [showAnswer]);
 
   useEffect(() => {
     if (showAnswer) return;
@@ -34,7 +63,7 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-iota-dark-blue w-full max-w-5xl rounded-2xl shadow-[0_0_50px_rgba(29,78,216,0.5)] border-4 border-iota-blue flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+      <div className="bg-iota-dark-blue w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-[0_0_50px_rgba(29,78,216,0.5)] border-4 border-iota-blue flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
 
         {/* Header / Value */}
         <div className="bg-blue-950 p-4 text-center border-b-2 border-iota-blue relative">
@@ -53,10 +82,26 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-8 md:p-16 flex flex-col items-center justify-center min-h-[40vh] text-center">
-          <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight uppercase drop-shadow-lg mb-12">
-            {clue.question}
-          </h1>
+        <div className="flex-1 p-4 md:p-8 w-full flex flex-col items-center justify-center min-h-[40vh] overflow-y-auto text-center">
+          {clue.imageUrl && (
+            <img 
+              src={clue.imageUrl} 
+              alt="Clue" 
+              className="max-h-72 object-contain mb-8 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] border border-white/20" 
+            />
+          )}
+          {clue.codeSnippet && (
+            <div className="bg-neutral-900 border border-neutral-700 p-4 rounded-xl w-full max-w-5xl text-left shadow-inner mb-4">
+              <pre className="text-emerald-400 font-mono text-sm md:text-base lg:text-lg whitespace-pre-wrap leading-tight">
+                <code>{clue.codeSnippet}</code>
+              </pre>
+            </div>
+          )}
+          {clue.question && (
+            <h1 className={`font-bold text-white leading-tight uppercase drop-shadow-lg mb-6 ${clue.codeSnippet ? 'text-xl md:text-2xl' : 'text-3xl md:text-5xl'}`}>
+              {clue.question}
+            </h1>
+          )}
 
           {showAnswer ? (
             <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
@@ -66,7 +111,10 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
             </div>
           ) : (
             <button
-              onClick={() => setShowAnswer(true)}
+              onClick={() => {
+                playAudio('Squid Game X Button Sound Effect.mp3');
+                setShowAnswer(true);
+              }}
               className="bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 rounded-full px-8 py-3 font-bold transition-all hover:scale-105"
             >
               Reveal Answer
