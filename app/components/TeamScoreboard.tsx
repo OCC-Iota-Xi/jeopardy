@@ -12,9 +12,10 @@ type TeamScoreboardProps = {
   teams: Team[];
   onAddTeam: (name: string) => void;
   onUpdateScore: (teamId: string, amount: number) => void;
+  onRemoveTeam?: (teamId: string) => void;
 };
 
-export default function TeamScoreboard({ teams, onAddTeam, onUpdateScore }: TeamScoreboardProps) {
+export default function TeamScoreboard({ teams, onAddTeam, onUpdateScore, onRemoveTeam }: TeamScoreboardProps) {
   const [newTeamName, setNewTeamName] = useState("");
 
   const handleAddTeam = (e: React.FormEvent) => {
@@ -31,9 +32,18 @@ export default function TeamScoreboard({ teams, onAddTeam, onUpdateScore }: Team
         {teams.map((team) => (
           <div
             key={team.id}
-            className="flex-1 min-w-[200px] max-w-[300px] bg-neutral-800 rounded-xl p-4 border border-neutral-700 flex flex-col items-center justify-between"
+            className="flex-1 min-w-[200px] max-w-[300px] bg-neutral-800 rounded-xl p-4 border border-neutral-700 flex flex-col items-center justify-between relative"
           >
-            <h3 className="text-xl font-bold text-white mb-2 truncate w-full text-center" title={team.name}>
+            {onRemoveTeam && (
+              <button
+                onClick={() => onRemoveTeam(team.id)}
+                className="absolute top-2 right-2 text-neutral-500 hover:text-red-500 transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-neutral-700"
+                title="Remove Team"
+              >
+                ✕
+              </button>
+            )}
+            <h3 className="text-xl font-bold text-white mb-2 truncate w-full text-center px-4" title={team.name}>
               {team.name}
             </h3>
             <div className={`text-4xl font-mono font-black mb-4 ${team.score < 0 ? "text-red-500" : "text-iota-light-gold"}`}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Questions } from "../data/questions";
 import { Team } from "./TeamScoreboard";
 
@@ -13,6 +13,23 @@ type ClueModalProps = {
 
 export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueModalProps) {
   const [showAnswer, setShowAnswer] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  useEffect(() => {
+    if (showAnswer) return;
+
+    const timerId = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerId);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [showAnswer]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -20,6 +37,9 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
 
         {/* Header / Value */}
         <div className="bg-blue-950 p-4 text-center border-b-2 border-iota-blue relative">
+          <div className="absolute top-1/2 -translate-y-1/2 left-6 text-xl md:text-2xl font-bold font-mono text-white bg-black/50 px-3 py-1 rounded border border-iota-blue/50 flex items-center gap-2">
+            ⏱ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+          </div>
           <h2 className="text-4xl md:text-5xl font-black text-iota-light-gold drop-shadow-md">
             ${clue.value}
           </h2>
@@ -66,13 +86,19 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
                   <span className="text-white font-bold max-w-[150px] truncate" title={team.name}>{team.name}</span>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => onAwardPoints(team.id, -clue.value)}
+                      onClick={() => {
+                        onAwardPoints(team.id, 0);
+                        onClose();
+                      }}
                       className="bg-red-900/80 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm transition-colors"
                     >
                       Incorrect
                     </button>
                     <button
-                      onClick={() => onAwardPoints(team.id, clue.value)}
+                      onClick={() => {
+                        onAwardPoints(team.id, clue.value);
+                        onClose();
+                      }}
                       className="bg-green-700/80 hover:bg-green-600 text-white font-bold py-1 px-3 rounded text-sm transition-colors"
                     >
                       Correct
