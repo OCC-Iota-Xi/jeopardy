@@ -20,7 +20,7 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
   useEffect(() => {
     audioRef.current = new Audio('/Squid Game Theme.mp3');
     audioRef.current.loop = true;
-    
+
     const playPromise = audioRef.current.play();
     if (playPromise !== undefined) {
       playPromise.catch(e => {
@@ -84,10 +84,10 @@ export default function ClueModal({ clue, teams, onAwardPoints, onClose }: ClueM
         {/* Content */}
         <div className="flex-1 p-4 md:p-8 w-full flex flex-col items-center justify-center min-h-[40vh] overflow-y-auto text-center">
           {clue.imageUrl && (
-            <img 
-              src={clue.imageUrl} 
-              alt="Clue" 
-              className="max-h-72 object-contain mb-8 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] border border-white/20" 
+            <img
+              src={clue.imageUrl}
+              alt="Clue"
+              className="max-h-72 object-contain mb-8 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] border border-white/20"
             />
           )}
           {clue.codeSnippet && (
